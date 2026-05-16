@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ernest Tech Simulator V2</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Arial,sans-serif;
+background:#050816;
+color:white;
+padding:20px;
+min-height:100vh;
+overflow-x:hidden;
+}
+
+body::before{
+content:'';
+position:fixed;
+width:500px;
+height:500px;
+background:rgba(0,255,200,0.08);
+top:-200px;
+right:-200px;
+border-radius:50%;
+filter:blur(120px);
+z-index:-1;
+}
+
+header{
+text-align:center;
+padding:30px 10px;
+}
+
+.logo{
+width:110px;
+height:110px;
+margin:auto;
+border-radius:50%;
+background:linear-gradient(135deg,#00ffd0,#00a2ff);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:38px;
+font-weight:bold;
+color:#050816;
+box-shadow:0 0 30px rgba(0,255,200,.4);
+}
+
+h1{
+margin-top:20px;
+font-size:40px;
+}
+
+.subtitle{
+margin-top:10px;
+color:#b8c2e0;
+}
+
+.dashboard{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.stat{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.1);
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.stat h2{
+color:#00ffd0;
+margin-bottom:10px;
+}
+
+.grid{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
+}
+
+.card{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.1);
+border-radius:20px;
+padding:25px;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+border-color:#00ffd0;
+}
+
+.card h2{
+margin-bottom:15px;
+color:#00ffd0;
+}
+
+.card p{
+line-height:1.6;
+color:#d6dcf0;
+}
+
+button{
+margin-top:18px;
+padding:12px 22px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+background:linear-gradient(135deg,#00ffd0,#00a2ff);
+color:#050816;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+
+.panel{
+margin-top:35px;
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.1);
+border-radius:25px;
+padding:30px;
+display:none;
+}
+
+.question{
+font-size:22px;
+margin:20px 0;
+}
+
+.answers button{
+display:block;
+width:100%;
+margin:10px 0;
+text-align:left;
+background:#11182d;
+color:white;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.answers button.correct{
+background:#146c43;
+}
+
+.answers button.wrong{
+background:#8b2331;
+}
+
+.progress-container{
+margin-top:20px;
+}
+
+.progress-bar{
+height:18px;
+background:#1c2340;
+border-radius:20px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.progress{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#00ffd0,#00a2ff);
+transition:.5s;
+}
+
+.badges{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:15px;
+}
+
+.badge{
+padding:10px 14px;
+background:rgba(255,255,255,.08);
+border-radius:12px;
+font-size:14px;
+}
+
+.counter-box{
+margin-top:20px;
+text-align:center;
+}
+
+.counter{
+font-size:60px;
+margin:20px 0;
+color:#00ffd0;
+}
+
+.counter-buttons{
+display:flex;
+justify-content:center;
+gap:15px;
+}
+
+.counter-buttons button{
+font-size:20px;
+padding:12px 20px;
+}
+
+textarea{
+width:100%;
+min-height:120px;
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+background:#11182d;
+color:white;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.feedback{
+margin-top:15px;
+line-height:1.7;
+color:#d6dcf0;
+}
+
+footer{
+margin-top:50px;
+text-align:center;
+color:#7f88a7;
+}
+
+@media(max-width:768px){
+
+h1{
+font-size:30px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+ETS
+</div>
+
+<h1>Ernest Tech Simulator</h1>
+
+<p class="subtitle">
+Simulation • JavaScript • Portfolio • Progression
+</p>
+
+</header>
+
+<div class="dashboard">
+
+<div class="stat">
+<h2>⭐ Score</h2>
+<p id="globalScore">0</p>
+</div>
+
+<div class="stat">
+<h2>📈 Niveau</h2>
+<p id="level">Débutant</p>
+</div>
+
+<div class="stat">
+<h2>🏅 Badges</h2>
+<p id="badgeCount">0</p>
+</div>
+
+</div>
+
+<div style="text-align:center; margin-top:25px;">
+
+<button onclick="resetSimulator()" 
+style="
+background:linear-gradient(135deg,#ff4d4d,#ff884d);
+color:white;
+padding:14px 28px;
+font-size:16px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-weight:bold;
+box-shadow:0 0 20px rgba(255,80,80,.3);
+">
+
+🔄 Remettre le simulateur à zéro
+
+</button>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>💻 Défis JavaScript</h2>
+
+<p>
+Répondez aux questions techniques et progressez.
+</p>
+
+<button onclick="startQuiz()">
+Commencer
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>🎯 Portfolio</h2>
+
+<p>
+Améliorez votre présentation professionnelle.
+</p>
+
+<button onclick="startPortfolio()">
+Ouvrir
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>🧠 Défi Compteur</h2>
+
+<p>
+Mini exercice interactif JavaScript.
+</p>
+
+<button onclick="startCounter()">
+Lancer
+</button>
+
+</div>
+
+</div>
+
+<div id="panel" class="panel">
+
+<h2 id="panelTitle"></h2>
+
+<div id="content"></div>
+
+<div class="progress-container">
+
+<p>Progression</p>
+
+<div class="progress-bar">
+<div class="progress" id="progress"></div>
+</div>
+
+</div>
+
+<div class="badges" id="badges"></div>
+
+</div>
+
+<footer>
+Ernest Tech Simulator • Version V2
+</footer>
+
+<script>
+
+let globalScore = localStorage.getItem("globalScore") || 0;
+let badgeTotal = localStorage.getItem("badgeTotal") || 0;
+
+document.getElementById("globalScore").innerText = globalScore;
+document.getElementById("badgeCount").innerText = badgeTotal;
+
+updateLevel();
+
+const panel = document.getElementById("panel");
+const panelTitle = document.getElementById("panelTitle");
+const content = document.getElementById("content");
+const progress = document.getElementById("progress");
+const badges = document.getElementById("badges");
+
+function addScore(points){
+
+globalScore = parseInt(globalScore) + points;
+
+localStorage.setItem("globalScore",globalScore);
+
+document.getElementById("globalScore").innerText = globalScore;
+
+updateLevel();
+
+}
+
+function addBadge(name){
+
+badgeTotal++;
+
+localStorage.setItem("badgeTotal",badgeTotal);
+
+document.getElementById("badgeCount").innerText = badgeTotal;
+
+const badge = document.createElement("div");
+
+badge.className = "badge";
+
+badge.innerText = name;
+
+badges.appendChild(badge);
+
+}
+
+function updateLevel(){
+
+let level = "Débutant";
+
+if(globalScore >= 50){
+level = "Intermédiaire";
+}
+
+if(globalScore >= 120){
+level = "Avancé";
+}
+
+document.getElementById("level").innerText = level;
+
+}
+
+function showPanel(title){
+
+panel.style.display = "block";
+
+panelTitle.innerText = title;
+
+badges.innerHTML = "";
+
+panel.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+const questions = [
+
+{
+q:"JavaScript permet principalement :",
+answers:[
+"Créer des animations et interactions",
+"Créer un serveur physique",
+"Installer Windows"
+],
+correct:0
+},
+
+{
+q:"Quel fichier contient le style ?",
+answers:[
+"script.js",
+"style.css",
+"index.php"
+],
+correct:1
+},
+
+{
+q:"GitHub sert à :",
+answers:[
+"Héberger et gérer du code",
+"Monter un PC",
+"Créer un écran"
+],
+correct:0
+}
+
+];
+
+let currentQuestion = 0;
+let quizScore = 0;
+
+function startQuiz(){
+
+showPanel("💻 Défis JavaScript");
+
+currentQuestion = 0;
+
+quizScore = 0;
+
+showQuestion();
+
+}
+
+function showQuestion(){
+
+const q = questions[currentQuestion];
+
+content.innerHTML = `
+
+<div class="question">
+${q.q}
+</div>
+
+<div class="answers">
+
+${q.answers.map((a,index)=>
+
+`<button onclick="checkAnswer(${index})">${a}</button>`
+
+).join('')}
+
+</div>
+
+`;
+
+progress.style.width = `${(currentQuestion/questions.length)*100}%`;
+
+}
+
+function checkAnswer(index){
+
+const q = questions[currentQuestion];
+
+const buttons = document.querySelectorAll(".answers button");
+
+buttons.forEach(btn=>btn.disabled=true);
+
+if(index === q.correct){
+
+buttons[index].classList.add("correct");
+
+quizScore++;
+
+addScore(10);
+
+}else{
+
+buttons[index].classList.add("wrong");
+
+buttons[q.correct].classList.add("correct");
+
+}
+
+setTimeout(()=>{
+
+currentQuestion++;
+
+if(currentQuestion < questions.length){
+
+showQuestion();
+
+}else{
+
+finishQuiz();
+
+}
+
+},1000);
+
+}
+
+function finishQuiz(){
+
+progress.style.width = "100%";
+
+content.innerHTML = `
+
+<h3>
+Quiz terminé ✅
+</h3>
+
+<p class="feedback">
+Vous avez obtenu ${quizScore} bonne(s) réponse(s).
+</p>
+
+<button onclick="startQuiz()">
+Recommencer
+</button>
+
+`;
+
+addBadge("JavaScript");
+
+}
+
+function startPortfolio(){
+
+showPanel("🎯 Mission Portfolio");
+
+content.innerHTML = `
+
+<p>
+Rédigez une présentation professionnelle.
+</p>
+
+<textarea id="portfolioText"></textarea>
+
+<button onclick="analyzePortfolio()">
+Analyser
+</button>
+
+<div id="portfolioFeedback" class="feedback"></div>
+
+`;
+
+progress.style.width = "20%";
+
+}
+
+function analyzePortfolio(){
+
+const text = document.getElementById("portfolioText").value;
+
+const feedback = document.getElementById("portfolioFeedback");
+
+if(text.length < 50){
+
+feedback.innerHTML =
+"Ajoutez davantage de détails professionnels.";
+
+progress.style.width = "35%";
+
+}else if(text.length < 150){
+
+feedback.innerHTML =
+"Bonne base 👍 continuez à développer vos compétences.";
+
+progress.style.width = "70%";
+
+addScore(10);
+
+}else{
+
+feedback.innerHTML =
+"Très bonne présentation professionnelle 🔥";
+
+progress.style.width = "100%";
+
+addScore(20);
+
+addBadge("Portfolio");
+
+}
+
+}
+
+let counter = 0;
+
+function startCounter(){
+
+showPanel("🧠 Défi Compteur");
+
+content.innerHTML = `
+
+<p>
+Exercice JavaScript interactif :
+</p>
+
+<div class="counter-box">
+
+<div class="counter" id="counterValue">
+0
+</div>
+
+<div class="counter-buttons">
+
+<button onclick="increaseCounter()">
++
+</button>
+
+<button onclick="decreaseCounter()">
+-
+</button>
+
+<button onclick="resetCounter()">
+Reset
+</button>
+
+</div>
+
+</div>
+
+`;
+
+progress.style.width = "50%";
+
+}
+
+function increaseCounter(){
+
+counter++;
+
+document.getElementById("counterValue").innerText = counter;
+
+addScore(1);
+
+if(counter >= 10){
+
+progress.style.width = "100%";
+
+addBadge("Counter Master");
+
+}
+
+}
+
+function decreaseCounter(){
+
+counter--;
+
+document.getElementById("counterValue").innerText = counter;
+
+}
+
+function resetCounter(){
+
+counter = 0;
+
+document.getElementById("counterValue").innerText = counter;
+
+}
+
+function resetSimulator(){
+
+const confirmReset = confirm(
+"Voulez-vous vraiment remettre toute la progression à zéro ?"
+);
+
+if(confirmReset){
+
+localStorage.clear();
+
+globalScore = 0;
+badgeTotal = 0;
+counter = 0;
+
+document.getElementById("globalScore").innerText = 0;
+document.getElementById("badgeCount").innerText = 0;
+document.getElementById("level").innerText = "Débutant";
+
+progress.style.width = "0%";
+
+badges.innerHTML = "";
+
+panel.style.display = "none";
+
+alert("Le simulateur a été réinitialisé ✅");
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
